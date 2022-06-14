@@ -1,0 +1,128 @@
+﻿<html>
+<head>
+<title>Popover</title>
+<style type=text/css>
+body { 
+	color: #000000;
+	font-family: Helvetica;
+}
+
+#container {
+    padding-top: 0.2em;
+    width:100%;
+    margin:0;
+    text-align:left;
+}
+
+#icon {
+    display: inline-block;
+    margin:0.1em; 
+    vertical-align:top;
+    padding-top: 1.4em;
+}
+
+#textcontainer {
+	position :relative;
+	display: inline-block;
+    margin:0 auto;
+    margin-left: 0.4em;
+    width: 80%;
+}
+
+#title {
+    padding-left: 0.2em;
+	font-size: 100%;
+	padding-bottom: 0.3em;
+	opacity: 0.7;
+}
+
+#description {
+    padding-left: 0.2em;
+	font-size: 85%;
+	opacity: 0.5;
+    padding-bottom: 0.2em;
+}
+
+#footnote {
+    padding-left: 0.2em;
+	font-size: 70%;
+	opacity: 0.5;
+    padding-bottom: 0.3em;
+}
+
+#dontshowagain {
+    padding-top: 0.3em;
+	font-size: 70%;
+	opacity: 0.5;
+}
+
+</style>
+<script>
+    var NotificationPopover = {
+        setContent: function (title, description, footer, icon) {
+            var titleElem = document.getElementById("title");
+            titleElem.textContent = title;
+            
+            var descElem = document.getElementById("description");
+            descElem.textContent = description;
+            
+            var footnoteElem = document.getElementById("footnote");
+            footnoteElem.innerHTML = footer;
+
+            var iconElem = document.getElementById("icon");
+            iconElem.src = icon;
+        },
+
+        dontShowAgain: function() {
+            var isChecked = document.getElementById("dontshowChkbox").checked;
+            safari.extension.settings["UFT_popover_alwaysshow"] = !isChecked;
+        }
+    }
+
+    safari.application.addEventListener("popover", function (event) {
+		if (event.target.identifier != "uftNotificationPopover")
+			return;
+		
+		var mode = safari.extension.globalPage.contentWindow.ext.app.getInteractionMode();
+		switch (mode) {
+            case "spy":
+                var title = "Object Spy Running";
+                var desc = "Click on a Web object to view its properties in UFT.";
+                var footer = "To pause the Spy, click <img src='../spy_16.png' width='12' height='12'>. To return the standard mouse pointer, hold the ⌘ key."
+                var iconName = "QTP_48.png"
+                break;
+		    default:
+		        // Do nothing
+                return;
+		}
+
+		var iconUrl = safari.extension.baseURI + 'Agent/Resources/' + iconName;
+		NotificationPopover.setContent(title, desc, footer, iconUrl);
+
+        //Reset Don't Show This again Checkbox
+		document.getElementById("dontshowChkbox").checked = false;
+    }, true);
+
+</script>
+</head>
+<body>
+<div id="container">
+  <img id="icon" />
+  <div id="textcontainer">
+	  <div id="title">
+	  </div>
+	  <div id="description">
+	  </div>
+      <div id="footnote">
+	  </div>
+      <div id="dontshowagain" >
+      <input id="dontshowChkbox" type="checkbox" /> Don't show this again.
+      </div>
+  </div>
+</div>
+<script>
+    var chkBoxElem = document.getElementById("dontshowChkbox");
+    chkBoxElem.addEventListener("click", NotificationPopover.dontShowAgain, false);
+</script>
+</body>
+</html>
